@@ -3,6 +3,7 @@ use std::io;
 
 pub mod day01;
 pub mod day02;
+pub mod day03;
 
 pub fn read_lines(filename: &str) -> io::Result<String> {
     let cwd = std::env::current_dir()?;
