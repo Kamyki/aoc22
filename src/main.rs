@@ -25,6 +25,7 @@ fn main() {
         1 => solve!(solvers::day01, &input),
         2 => solve!(solvers::day02, &input),
         3 => solve!(solvers::day03, &input),
+        6 => solve!(solvers::day06, &input),
         _ => {
             unimplemented!("yet");
         }
