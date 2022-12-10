@@ -53,6 +53,7 @@ fn main() {
         1 => solve!(solvers::day01, &input),
         2 => solve!(solvers::day02, &input),
         3 => solve!(solvers::day03, &input),
+        4 => solve!(solvers::day04, &input),
         5 => solve!(solvers::day05, &input),
         6 => solve!(solvers::day06, &input),
         _ => {
