@@ -40,10 +40,10 @@ impl<'a, const BUCKET_SIZE: usize> Iterator for InstructionStream<'a, BUCKET_SIZ
             }
 
             if self.bucket.len() < BUCKET_SIZE {
-                return Some(None);
+                Some(None)
             } else {
                 self.found = true;
-                return Some(Some(i as i32 + 1));
+                Some(Some(i as i32 + 1))
             }
         } else {
             None

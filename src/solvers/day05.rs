@@ -17,9 +17,9 @@ enum Slot {
 
 #[derive(Debug, PartialEq, Eq)]
 enum ParseError {
-    ParseCrateError,
-    ParseInstructionError,
-    ParseLineError,
+    Crate,
+    Instruction,
+    Line,
 }
 
 impl From<Crate> for Slot {
@@ -61,7 +61,7 @@ impl FromStr for SupplyStacks {
         let mut stacks: HashMap<usize, VecDeque<Crate>> = HashMap::new();
         let mut lines = s.lines();
 
-        while let Some(line) = lines.next() {
+        for line in lines.by_ref() {
             if !line.starts_with(" 1") {
                 let mut i = 0;
                 while i * 4 + 2 < line.len() {
@@ -77,7 +77,7 @@ impl FromStr for SupplyStacks {
         }
         match lines.next() {
             Some("") => Ok(()),
-            _ => Err(ParseError::ParseLineError),
+            _ => Err(ParseError::Line),
         }?;
 
         let instructions = lines
@@ -99,18 +99,18 @@ impl FromStr for Crate {
         if let Some('[') = chars.next() {
             Ok(())
         } else {
-            Err(Self::Err::ParseCrateError)
+            Err(Self::Err::Crate)
         }?;
         let n = chars.next();
         if let Some(']') = chars.next() {
             Ok(())
         } else {
-            Err(Self::Err::ParseCrateError)
+            Err(Self::Err::Crate)
         }?;
-        if let None = chars.next() {
+        if chars.next().is_none() {
             Ok(())
         } else {
-            Err(Self::Err::ParseCrateError)
+            Err(Self::Err::Crate)
         }?;
         Ok(Self(n.unwrap()))
     }
@@ -118,7 +118,7 @@ impl FromStr for Crate {
 
 impl From<ParseIntError> for ParseError {
     fn from(_: ParseIntError) -> Self {
-        Self::ParseInstructionError
+        Self::Instruction
     }
 }
 
@@ -131,29 +131,29 @@ impl FromStr for Instruction {
         if s.starts_with("move ") {
             Ok(())
         } else {
-            Err(Self::Err::ParseInstructionError)
+            Err(Self::Err::Instruction)
         }?;
         s = &s[5..];
 
-        let space = s.find(" ").ok_or(Self::Err::ParseInstructionError)?;
+        let space = s.find(' ').ok_or(Self::Err::Instruction)?;
         let amount: usize = s[..space].parse()?;
         s = &s[space + 1..];
 
         if let Some(0) = s.find("from ") {
             Ok(())
         } else {
-            Err(Self::Err::ParseInstructionError)
+            Err(Self::Err::Instruction)
         }?;
         s = &s[5..];
 
-        let space = s.find(" ").ok_or(Self::Err::ParseInstructionError)?;
+        let space = s.find(' ').ok_or(Self::Err::Instruction)?;
         let from: usize = s[..space].parse()?;
         s = &s[space + 1..];
 
         if let Some(0) = s.find("to ") {
             Ok(())
         } else {
-            Err(Self::Err::ParseInstructionError)
+            Err(Self::Err::Instruction)
         }?;
         s = &s[3..];
 
@@ -170,12 +170,11 @@ impl SupplyStacks {
             let stack = self.stacks.get_mut(&instr.to).unwrap();
             stack.extend(s.into_iter().rev());
         }
-        let x = (1..=self.stacks.len())
+        (1..=self.stacks.len())
             .map(|i| self.stacks.get(&i))
             .map(|m| m.and_then(|v| v.back()))
             .map(|c| c.unwrap().0)
-            .join("");
-        x
+            .join("")
     }
 
     fn simulate2(&mut self) -> String {
@@ -185,12 +184,11 @@ impl SupplyStacks {
             let stack = self.stacks.get_mut(&instr.to).unwrap();
             stack.extend(s);
         }
-        let x = (1..=self.stacks.len())
+        (1..=self.stacks.len())
             .map(|i| self.stacks.get(&i))
             .map(|m| m.and_then(|v| v.back()))
             .map(|c| c.unwrap().0)
-            .join("");
-        x
+            .join("")
     }
 }
 
@@ -255,7 +253,7 @@ mod tests {
     fn test_instruction_from_str_3() {
         let input = "move 1 from 1 to 2 ";
         let res = input.parse::<Instruction>();
-        assert_eq!(res, Err(ParseError::ParseInstructionError),);
+        assert_eq!(res, Err(ParseError::Instruction),);
     }
 
     #[test]
@@ -269,14 +267,14 @@ mod tests {
     fn test_crate_from_str_2() {
         let input = "[12]";
         let res = input.parse::<Crate>();
-        assert_eq!(res, Err(ParseError::ParseCrateError));
+        assert_eq!(res, Err(ParseError::Crate));
     }
 
     #[test]
     fn test_crate_from_str_3() {
         let input = "[1] ";
         let res = input.parse::<Crate>();
-        assert_eq!(res, Err(ParseError::ParseCrateError));
+        assert_eq!(res, Err(ParseError::Crate));
     }
 
     #[test]

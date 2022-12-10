@@ -23,9 +23,9 @@ pub fn solve_part_two(input: &str) -> i32 {
         .map(|i| i.iter().map(|j| j.unwrap()).sum())
         .collect();
     for mut elf_calories in elves_calories {
-        for i in 0..3 {
-            if elf_calories > most_carried_calories[i] {
-                swap(&mut elf_calories, &mut most_carried_calories[i]);
+        for most_carried_cal in most_carried_calories.iter_mut() {
+            if elf_calories > *most_carried_cal {
+                swap(&mut elf_calories,  most_carried_cal);
             }
         }
     }

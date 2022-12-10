@@ -1,13 +1,13 @@
-use std::collections::{btree_set::Intersection, hash_map::RandomState, HashSet};
+use std::collections::{hash_map::RandomState, HashSet};
 
 use itertools::Itertools;
 
 fn priority(ch: &char) -> i32 {
     if ch.is_alphabetic() {
         if ch.is_ascii_lowercase() {
-            return (*ch as i32) - 96;
+            *ch as i32 - 96
         } else {
-            return (*ch as i32) - 38;
+            *ch as i32 - 38
         }
     } else {
         panic!("Unknown item type")
@@ -22,7 +22,7 @@ pub fn solve_part_one(input: &str) -> i32 {
         let first: HashSet<char, RandomState> = HashSet::from_iter(first_part.chars());
         let second: HashSet<char, RandomState> = HashSet::from_iter(second_part.chars());
         let interection = first.intersection(&second);
-        priority_sum += interection.map(|x| priority(x)).sum::<i32>()
+        priority_sum += interection.map(priority).sum::<i32>()
     }
     priority_sum
 }
@@ -35,13 +35,14 @@ pub fn solve_part_two(input: &str) -> i32 {
         .map(HashSet::from_iter)
         .chunks(3)
     {
-        let (g1,g2,g3) = group.next_tuple().unwrap();
+        let (g1, g2, g3) = group.next_tuple().unwrap();
         priority_sum += g1
             .intersection(&g2)
             .cloned()
             .collect::<HashSet<char, RandomState>>()
             .intersection(&g3)
-            .map(priority).sum::<i32>();
+            .map(priority)
+            .sum::<i32>();
     }
     priority_sum
 }
